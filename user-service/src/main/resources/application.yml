@@ -1,0 +1,32 @@
+server:
+  port: 8080
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  datasource:
+    url: jdbc:sqlite:D:\dev.db
+    driverClassName: org.sqlite.JDBC
+    username: sa
+    password: password
+    hikari:
+      #      maximumPoolSize: 5  # Adjust based on your analysis
+      #      idleTimeout: 10000  # 1 minutes in milliseconds
+      connectionTimeout: 10000  # 10 seconds in milliseconds
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate.dialect: org.hibernate.community.dialect.SQLiteDialect
+    #    database-platform: org.hibernate.dialect.SQLiteDialect  //this is new approach of defining dialect, :spring data jpa
+    hibernate:
+      ddl-auto: create # This line instructs Hibernate to create tables if they don't exist
+      show_sql: true
+      format_sql: true
+
+springdoc:
+  swagger-ui:
+    operationsSorter: method
+    defaultModelsExpandDepth: -1
+
+#  springdoc.packagesToScan=package1, package2
+#  springdoc.pathsToMatch=/v1, /api/balance/**
