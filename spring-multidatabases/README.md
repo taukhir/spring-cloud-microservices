@@ -19,65 +19,31 @@ In each configuration class, we’ll need to define the following interfaces for
   * TransactionManager (userTransactionManager)
 
 #### code
-
 @Configuration
-@PropertySource({ "classpath:persistence-multiple-db.properties" })
-@EnableJpaRepositories(
-    basePackages = "com.baeldung.multipledb.dao.user", 
-    entityManagerFactoryRef = "userEntityManager", 
-    transactionManagerRef = "userTransactionManager"
-)
-public class PersistenceUserConfiguration {
-    @Autowired
-    private Environment env;
-    
-    @Bean
-    @Primary
-    public LocalContainerEntityManagerFactoryBean userEntityManager() {
-        LocalContainerEntityManagerFactoryBean em
-          = new LocalContainerEntityManagerFactoryBean();
-        em.setDataSource(userDataSource());
-        em.setPackagesToScan(
-          new String[] { "com.baeldung.multipledb.model.user" });
+@EnableTransactionManagement
+@EnableJpaRepositories(entityManagerFactoryRef = "userEntityManagerFactory", transactionManagerRef = "userTransactionManager", basePackages = "com.ahmed.repo.user")
+public class UserDatasource {
 
-        HibernateJpaVendorAdapter vendorAdapter
-          = new HibernateJpaVendorAdapter();
-        em.setJpaVendorAdapter(vendorAdapter);
-        HashMap<String, Object> properties = new HashMap<>();
-        properties.put("hibernate.hbm2ddl.auto",
-          env.getProperty("hibernate.hbm2ddl.auto"));
-        properties.put("hibernate.dialect",
-          env.getProperty("hibernate.dialect"));
-        em.setJpaPropertyMap(properties);
+	@Bean(name = "userDataSource")
+	@ConfigurationProperties(prefix = "spring.user.datasource")
+	public DataSource userDataSource() {
+		return DataSourceBuilder.create().build();
+	}
 
-        return em;
-    }
+	@Bean(name = "userEntityManagerFactory")
+	public LocalContainerEntityManagerFactoryBean entityManagerFactory(EntityManagerFactoryBuilder builder,
+			@Qualifier("userDataSource") DataSource dataSource) {
+		HashMap<String, Object> properties = new HashMap<>();
+		return builder.dataSource(dataSource).properties(properties).packages("com.ahmed.model.user").persistenceUnit("User")
+				.build();
+	}
 
-    @Primary
-    @Bean
-    public DataSource userDataSource() {
- 
-        DriverManagerDataSource dataSource
-          = new DriverManagerDataSource();
-        dataSource.setDriverClassName(
-          env.getProperty("jdbc.driverClassName"));
-        dataSource.setUrl(env.getProperty("user.jdbc.url"));
-        dataSource.setUsername(env.getProperty("jdbc.user"));
-        dataSource.setPassword(env.getProperty("jdbc.pass"));
-
-        return dataSource;
-    }
-
-    @Primary
-    @Bean
-    public PlatformTransactionManager userTransactionManager() {
- 
-        JpaTransactionManager transactionManager
-          = new JpaTransactionManager();
-        transactionManager.setEntityManagerFactory(
-          userEntityManager().getObject());
-        return transactionManager;
-    }
+	@Primary
+	@Bean(name = "userTransactionManager")
+	public PlatformTransactionManager transactionManager(
+			@Qualifier("userEntityManagerFactory") EntityManagerFactory entityManagerFactory) {
+		return new JpaTransactionManager(entityManagerFactory);
+	}
 }
 
 ### properties 
@@ -92,6 +58,14 @@ spring.datasource.password = [password]
 Copy
 We now want to keep using the same way to configure the second DataSource, but with a different property namespace:
 
-spring.second-datasource.jdbcUrl = [url]
-spring.second-datasource.username = [username]
-spring.second-datasource.password = [password]
+spring.user.datasource.jdbc-url=jdbc:mysql://localhost:3306/dev
+spring.user.datasource.username=root
+spring.user.datasource.password=T@uq33r@007
+spring.user.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+#spring.user.database-platform=org.hibernate.dialect.H2Dialect
+
+spring.booking.datasource.jdbc-url=jdbc:mysql://localhost:3306/testing
+spring.booking.datasource.username=root
+spring.booking.datasource.password=T@uq33r@007
+spring.booking.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+#spring.booking.database-platform=org.hibernate.dialect.H2Dialect
