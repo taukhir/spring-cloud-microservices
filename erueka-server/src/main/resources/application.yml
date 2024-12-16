@@ -1,0 +1,26 @@
+server:
+  port: 8761  # Port number on which Eureka server will listen
+
+eureka:
+  instance:
+    hostname: eureka  # Hostname of the Eureka server instance
+    prefer-ip-address: false  # Prefer IP address over hostname for registration
+    leaseRenewalIntervalInSeconds: 30  # Interval in seconds for lease renewal
+    leaseExpirationDurationInSeconds: 90  # Duration in seconds before lease expiration
+
+  client:
+    registerWithEureka: false  # Disable self-registration of the server
+    fetchRegistry: false  # Disable fetching registry from other Eureka servers
+
+  server:
+    eviction-interval-timer-in-ms: 60000  # Interval in milliseconds for removing stale registrations
+    renewal-lease-duration-in-seconds: 30  # Duration in seconds for lease renewal
+    wait-time-in-ms-when-sync-failed: 2000  # Wait time in milliseconds when synchronization fails
+
+spring:
+  application:
+    name: eureka-server  # Name of the Spring Boot application
+
+logging:
+  level:
+    com.netflix.eureka: INFO  # Logging level for Eureka-related components
