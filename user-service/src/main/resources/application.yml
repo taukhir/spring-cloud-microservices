@@ -28,5 +28,11 @@ springdoc:
     operationsSorter: method
     defaultModelsExpandDepth: -1
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
 #  springdoc.packagesToScan=package1, package2
 #  springdoc.pathsToMatch=/v1, /api/balance/**
