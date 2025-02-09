@@ -6,6 +6,9 @@ import org.ahmed.exception.ResourceNotFoundException;
 import org.ahmed.model.User;
 import org.ahmed.repository.UserRepository;
 import org.ahmed.util.EntityMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
@@ -60,6 +63,15 @@ public class UserService {
     @Transactional
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
+    }
+
+    //pageable users
+    public Page<User> getUsersPage(Pageable pageable){
+        return userRepository.findAll(pageable);
+    }
+
+    public Iterable<User> getSortedUser(Sort sort){
+        return userRepository.findAll(sort);
     }
 
     // Async method for bulk employee creation

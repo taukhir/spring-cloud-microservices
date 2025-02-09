@@ -1,0 +1,9 @@
+server:
+  port: 8765
+
+spring:
+  application:
+    name: api-gateway
+  security:
+    name : ahmed
+    password : ahmed@777

@@ -77,17 +77,17 @@ public abstract class AuditableEntity implements Serializable {
         this.updatedAt = LocalDateTime.now();
         this.updatedBy = getCurrentUsername();
     }
-
-    // Method to obtain the current username from the security context or session
-    private String getCurrentUsername() {
-        return AppConstants.DEFAULT_USER;
-    }
-
+    
     /**
      * This event occurs just before an entity is removed from the database.
      */
     @PreRemove
     protected void onRemove() {
         // Implement auditing logic here, e.g., setting deletion timestamp and user.
+    }
+
+    // Method to obtain the current username from the security context or session
+    private String getCurrentUsername() {
+        return AppConstants.DEFAULT_USER;
     }
 }
