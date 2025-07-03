@@ -1,0 +1,29 @@
+# Stage 1: Build
+FROM eclipse-temurin:21-jdk-alpine AS builder
+
+WORKDIR /app
+
+# Copy Gradle wrapper and build setup files (improves layer caching)
+COPY gradlew settings.gradle build.gradle ./
+COPY gradle ./gradle
+
+# Download dependencies and enable build cache
+RUN ./gradlew build --configuration-cache -x test || true
+
+# Now copy the full source code
+COPY . .
+
+# Build the project (final build)
+RUN ./gradlew clean bootJar --configuration-cache -x test
+
+# Stage 2: Run
+FROM eclipse-temurin:21-jre-alpine
+
+WORKDIR /app
+
+# Copy only the final executable jar (reduce image size)
+COPY --from=builder /app/build/libs/*SNAPSHOT.jar user-service.jar
+
+EXPOSE 8080
+
+ENTRYPOINT ["java", "-jar", "user-service.jar"]

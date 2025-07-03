@@ -2,25 +2,23 @@ server:
   port: 8080
 
 spring:
-  main:
-    allow-bean-definition-overriding: true
   datasource:
-    url: jdbc:mysql://localhost:3306/userdb
-    username: root
-    password: root
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
+      initialization-fail-timeout: 60000  # wait 60 seconds before failing
       connectionTimeout: 10000
   jpa:
     open-in-view: false
+    hibernate:
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
+    show-sql: ${SPRING_JPA_SHOW_SQL:true}
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
-#        database-platform: org.hibernate.dialect.SQLiteDialect  //this is new approach of defining dialect, :spring data jpa
-    hibernate:
-      ddl-auto: create # This line instructs Hibernate to create tables if they don't exist
-      show_sql: true
-      format_sql: true
+
 
 springdoc:
   swagger-ui:
